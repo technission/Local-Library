@@ -1,18 +1,5 @@
 // This will return the account object that matches the given ID
-function findAccountById(accounts, id) {
-    // loop through the accounts array
-    for (num in accounts) {
-        if (id === accounts[num].id) {
-            return accounts[num];
-        }
-    }
-//    for (let i = 0; i < accounts.length; i++) {
-//        // check to see if the id matches and return the account object that has the matching ID
-//        if (id === accounts[i].id) {
-//            return accounts[i];
-//        }
-//    }
-}
+const findAccountById = (accounts, id) => accounts.find((acct) => acct.id === id);
 
 // This will sort all accounts by last name and return every object
 function sortAccountsByLastName(accounts) {
@@ -31,48 +18,54 @@ function sortAccountsByLastName(accounts) {
                          
 // This will return a number that states how many times the id appears in the borrows within the books array
 function numberOfBorrows(account, books) {
-    let total = 0;
-    //console.log(books[1].borrows[1].id)
-    for (let i = 0; i < books.length; i++) {
-        const book = books[i];
-        const borrows = books[i].borrows;
-        for (let j = 0; j < borrows.length; j++) {
-            // console.log('borrows[j].id', borrows[j].id);
-            if (account.id === borrows[j].id) {
-                total += 1;
-            }
-        } 
-    }
-    return total;
-} 
+  let result = books.reduce((acc, book) => {
+    for(let i = 0; i < book.borrows.length; i++) {
+      if(book.borrows[i].id === account.id) {
+      acc++
+    }}
+    return acc
+  },0)
+  return result
+}
+ 
 
-// This will return an array of books and authors that represents all books currently checked out by the given account and combine book and author inside the return object
+// this will return an array of books and authors that represent all books currently checked out by given account.
+// the author object that matches must be embedded in the return
 function getBooksPossessedByAccount(account, books, authors) {
-    //return an array
-//    console.log('account', account);
-//    console.log('books', books);
-//    console.log('authors', authors);
-    // declare the account id variable
-    const accountID = account.id;
-    // empty array for result
-    let result = [];
-    // loop through books 
-    for (let i = 0; i < books.length; i++) {
-        // declare variables for borrowed books and books array
-        const borrows = books[i].borrows;
-        const book = books[i];
-            // loop through borrows array
-            for (let j = 0; j < borrows.length; j++) {
-                // check to see if the account id matches the borrowed id and make sure it's not be returned to the library
-                if (accountID === borrows[j].id && borrows[j].returned === false) {
-                    result.push(book)
-                    
-                    // need to add the authors array in here after books.authorID
-                }
-            }
-    }
-    console.log('accountID', accountID);
-    console.log(result);
+  // declare a varialbe for the end result
+  let result = [];
+  // declare a variable for the matching borrow object
+  let borrowMatch = [];
+  // loop through books
+  books.forEach(function(item){
+    // declare a variable for just the borrows object
+    const borrowed = item.borrows;
+    // destructure book
+    const book = {
+      id: item.id,
+      title: item.title,
+      genre: item.genre,
+      authorId: item.authorId,
+      author: {},
+      borrows: {}
+    };
+    const {id, title, genre, authorId, author, borrows} = book;
+
+    // loop through borrowed
+    borrowed.forEach(function(borrow){
+      // check to see if borrow.id is equal to accountId and book hasn't been returned
+      if (borrow.id === account.id && borrow.returned === false) {
+        // if match is found then push that book into the result object
+        result.push(book); // this pushes the book object only
+        borrowMatch.push(borrow);
+        // set borrows within the book object to the matching borrows array
+        book.borrows = borrowMatch;
+        // filter the authors array to only give the one author object not all the authors
+        book.author = authors.filter(auth => auth.id === book.authorId)[0];
+      }
+    });
+  });
+  return result;
 }
 
 module.exports = {
