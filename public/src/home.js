@@ -32,10 +32,6 @@ function booksBorrowedCount(books) {
       for (num in booksBorrowed) {
         // check to see if the returned status is false
         total = booksBorrowed[num].returned === false ? total += 1 : total = total;
-//         if (booksBorrowed[num].returned === false) {
-//           // if returned status is false then add 1 to the total
-//           total += 1;
-//         }
       }
   });
   return total;
